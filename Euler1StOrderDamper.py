@@ -12,22 +12,28 @@ time = 0.0 # we will take care of the simulation loop here
 # so then we will define matrix A and B since they will remain constant
 
 A = np.array([[-b/m, -k/m],[1.0, 0.0]])
-print(A)
 B = np.array([f*(1/m), 0.0])
 Mat_tPlus1 = np.array([0.0,0.0]) #this will store the value of vDot at 0 and xDot at 1 for the next step.
 Mat = np.array([0.0,0.0]) #this will store the value of veclocity at 0 and position at 1 for the next step. Initially we are assuming it 0
+ansVelo, ansPos, timeList = [0], [0], [0] #initiating three empty list to populte later on
 
-#plt.plot(Mat[0],Mat[1],'ro')
+#running the loop untill we reach time interval of 10 sec with dt of 0.01 sec
+while (time < 10):
+    Mat_tPlus1 = np.matmul(A,Mat) + B  #performing xDot(t) = Ax(t) + Bu(t) for the main equation
+    Mat[0] += Mat_tPlus1[0]*dt #calculating velocity using acceleration 
+    Mat[1] += Mat_tPlus1[1]*dt #calculating position using velocity
+    time += dt #accumulating time as we go
+    ansVelo.append(Mat[0]) # populating main three lists to plot the graph
+    ansPos.append(Mat[1])
+    timeList.append(time)
 
-if True:
-    while (time < 10):
-        Mat_tPlus1 = np.matmul(A,Mat) + B
-        print("Mat Plust t {}".format(Mat_tPlus1))
-        print("Mat {}".format(Mat))
-        Mat[0] += Mat_tPlus1[0]*dt
-        Mat[1] += Mat_tPlus1[1]*dt
-        time += dt
-        plt.plot(time,Mat[0],'ro')
-        plt.plot(time,Mat[1],'bo')
-
-plt.show()   
+if (len(timeList) == len(ansVelo) and len(ansVelo) == len(ansPos)): #checking if the length of the lists are same
+    fig, axis = plt.subplots(2) #creating two subplots to stack on eachother
+    axis[0].plot(timeList,ansPos)
+    axis[1].plot(timeList,ansVelo)
+    plt.show()
+else:
+    print("Length of all three lists is not equal!")
+    print("Length of Time stamp list : {}".format(len(timeList)))
+    print("Length of Velocity stamp list : {}".format(len(ansVelo)))
+    print("Length of Position stamp list : {}".format(len(ansPos)))   
