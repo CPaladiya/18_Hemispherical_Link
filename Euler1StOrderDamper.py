@@ -28,9 +28,19 @@ while (time < 10):
     timeList.append(time)
 
 if (len(timeList) == len(ansVelo) and len(ansVelo) == len(ansPos)): #checking if the length of the lists are same
-    fig, axis = plt.subplots(2) #creating two subplots to stack on eachother
+    fig, axis = plt.subplots(2,1) #creating two subplots to stack on eachother
+    fig.suptitle('Euler 1st Order Damping Simulation')
     axis[0].plot(timeList,ansPos)
     axis[1].plot(timeList,ansVelo)
+    # Hide x labels and tick labels for top plots and y ticks for right plots.
+    axis[0].set(ylabel = 'Position (m)')
+    axis[1].set(xlabel = 'Time(s)', ylabel = 'Velocity (m/s)')
+    # Turning on grid for both graphs
+    axis[0].grid(True)
+    axis[1].grid(True)
+    # Adding labels to the left of plots and at the bottom
+    for ax in axis.flat:
+        ax.label_outer()
     plt.show()
 else:
     print("Length of all three lists is not equal!")
