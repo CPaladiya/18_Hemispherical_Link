@@ -46,4 +46,4 @@ else:
     print("Length of all three lists is not equal!")
     print("Length of Time stamp list : {}".format(len(timeList)))
     print("Length of Velocity stamp list : {}".format(len(ansVelo)))
-    print("Length of Position stamp list : {}".format(len(ansPos)))   
+    print("Length of Position stamp list : {}".format(len(ansPos)))
