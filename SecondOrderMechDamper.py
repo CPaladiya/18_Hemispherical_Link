@@ -16,16 +16,14 @@ time = 0.0 # we will take care of the simulation loop here
 A = np.array([[-b/m, -k/m],[1.0, 0.0]])
 B = np.array([f*(1/m), 0.0])
 F = expm(np.multiply(A,dt))
-G = np.matmul(np.matmul(F,np.substract(np.identity(2),expm(np.multiply(A,-1*dt)))),np.matmul(np.linalg.inv(A),B))
+G = np.matmul(F, np.matmul(np.subtract(np.identity(2),expm(np.multiply(A,-1*dt))),np.matmul(np.linalg.inv(A),B)))
 Mat_tPlus1 = np.array([0.0,0.0]) #this will store the value of vDot at 0 and xDot at 1 for the next step.
 Mat = np.array([0.0,0.0]) #this will store the value of veclocity at 0 and position at 1 for the next step. Initially we are assuming it 0
 ansVelo, ansPos, timeList = [0], [0], [0] #initiating three empty list to populte later on
 
 #running the loop untill we reach time interval of 10 sec with dt of 0.01 sec
 while (time < 10):
-    Mat_tPlus1 = np.matmul(F,Mat) + np.multiply(G,f)  #performing xDot(t) = Ax(t) + Bu(t) for the main equation
-    Mat[0] += Mat_tPlus1[0]*dt #calculating velocity using acceleration 
-    Mat[1] += Mat_tPlus1[1]*dt #calculating position using velocity
+    Mat = np.matmul(F,Mat) + np.multiply(G,f)  
     time += dt #accumulating time as we go
     ansVelo.append(Mat[0]) # populating main three lists to plot the graph
     ansPos.append(Mat[1])
