@@ -1,4 +1,3 @@
-
 from picamera import PiCamera
 from picamera.array import PiRGBArray
 from gpiozero.pins.pigpio import PiGPIOFactory
@@ -6,6 +5,7 @@ from gpiozero import Servo
 from time import sleep
 import numpy as np
 import cv2
+import LiveCenter as LC
 
 ########### ---------------------- attaching the servos---------------------------
 #before running the program do 'sudo pigpiod' in terminal
@@ -43,7 +43,7 @@ upper_green = np.array([86,255,255])
 for frame in camera.capture_continuous(rawCapture, format = "bgr", use_video_port = True):
     #grabbing the numpy array from the frame to do further processing
     image = frame.array
-    
+
     ####### ----------------- creating a mask------------------
     #converting BGR image into hsv image space
     hsv_frame = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
@@ -57,15 +57,21 @@ for frame in camera.capture_continuous(rawCapture, format = "bgr", use_video_por
     #now we will use this mask to filter the object based on color as we like
     masked = cv2.bitwise_and(image,image, mask = mask)
     
-    #######---------------------creating binary image to find centroid
+    #######--------------creating binary image to find centroid & project live location of the object
     #creating binary image helps in increasing the accuracy
     ret,binaryImage = cv2.threshold(mask,250,255,cv2.THRESH_BINARY)
+    #finding contours within that binary image
     
+    #getting the live center of the ball 
+    Ball_X, Ball_Y = LC.GetLiveCenter(binaryImage,masked)
+    
+    #Drawing axis and center of the image
+    LC.DrawAxis(masked)
+    #Drawing offset with respect to center of image and drawing live center of the ball
+    LC.PrintCentersOnImage(masked, Ball_X,Ball_Y)
     
     cv2.imshow("Frame", image) #showing the frame we just captured
-    cv2.imshow("Mask", mask)
-    cv2.imshow("Masked Frame", masked)
-    cv2.imshow("Binary Image", binaryImage)
+    cv2.imshow("Masked Frame", masked) #showing the live masked feed
     key = cv2.waitKey(1) #& 0xFF #showing the frame
     
     rawCapture.truncate(0) #clear the stream in preparation of the next frame
