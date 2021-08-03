@@ -14,6 +14,8 @@ class DomeServo:
         #bottom camera servo configuration
         self.SB = Servo(18, min_pulse_width=0.5/1000, max_pulse_width=2.5/1000, pin_factory = factory)
         self.SB.value = 0
+        self.Offset_X = 0.0
+        self.Offset_Y = 0.0
         
     #we set value within limit otherwise we print overlimit in terminal
     #range allowed -0.6 to 0.6. limited to save hardware and wires
@@ -44,3 +46,4 @@ class DomeServo:
                 self.ST.value = -0.25
             else:
                 self.ST.value = -1.0
+        
