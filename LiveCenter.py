@@ -31,7 +31,7 @@ def DrawAxis(Image):
     #Drawing Y-axis within the image
     cv2.line(Image, (X,0),(X,h), (0,0,255),1)
     
-def PrintCentersOnImage(Image,ball_X,ball_Y):
+def PlotCentersAndGetOffset(Image,ball_X,ball_Y):
     '''Takes in live image from the feed, mostly a masked image, live location of ball. It draws, center of ball, the offset lines from axis and prints
        numbers on screen for offset and live location of the ball
     '''
@@ -54,4 +54,6 @@ def PrintCentersOnImage(Image,ball_X,ball_Y):
         #drawing offset line from center of the ball to the relevant axis
         cv2.line(Image, (ball_X,ball_Y),(ball_X,int(hImage/2)), (0,255,255),1)
         cv2.line(Image, (ball_X,ball_Y),(int(wImage/2),ball_Y), (0,255,255),1)
+        return X_offset,Y_offset
+    return 0,0
             
