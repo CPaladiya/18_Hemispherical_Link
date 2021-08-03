@@ -6,19 +6,13 @@ from time import sleep
 import numpy as np
 import cv2
 import LiveCenter as LC
+from DomeServo import DomeServo
 
-########### ---------------------- attaching the servos---------------------------
-#before running the program do 'sudo pigpiod' in terminal
-factory = PiGPIOFactory() #since the pulses are software generated we want to mimic hardware generated to remove jitter from servop
+########---------------------------initiating a class instance for servo------------
+AllServo = DomeServo()
 
-#top camera servo configuration, here we have set pulse width to reach full capabilities of servo
-servoT= Servo(17, min_pulse_width=0.5/1000, max_pulse_width=2.5/1000, pin_factory = factory)
-#bottom camera servo configuration
-servoB = Servo(18, min_pulse_width=0.5/1000, max_pulse_width=2.5/1000, pin_factory = factory)
-
-servoT.value = -1 #maximum allowed -1 to -0.4, limited to save hardware and wires
-servoB.value = 0 #range allowed -0.6 to 0.6. limited to save hardware and wires
-
+sleep(1)
+#AllServo.SetSBValue(0.2)
 #########-------------------------------Camera config-----------------------------
 #lets start all thing related camera
 camera = PiCamera()
@@ -63,14 +57,14 @@ for frame in camera.capture_continuous(rawCapture, format = "bgr", use_video_por
     #finding contours within that binary image
     
     #getting the live center of the ball 
-    Ball_X, Ball_Y = LC.GetLiveCenter(binaryImage,masked)
+    Ball_X, Ball_Y = LC.GetLiveCenter(binaryImage)
     
     #Drawing axis and center of the image
     LC.DrawAxis(masked)
     #Drawing offset with respect to center of image and drawing live center of the ball
     LC.PrintCentersOnImage(masked, Ball_X,Ball_Y)
     
-    cv2.imshow("Frame", image) #showing the frame we just captured
+    #cv2.imshow("Frame", image) #showing the frame we just captured
     cv2.imshow("Masked Frame", masked) #showing the live masked feed
     key = cv2.waitKey(1) #& 0xFF #showing the frame
     
