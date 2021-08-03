@@ -17,23 +17,30 @@ class DomeServo:
         
     #we set value within limit otherwise we print overlimit in terminal
     #range allowed -0.6 to 0.6. limited to save hardware and wires
-    def SetSBValue(self,AddValue):
+    def AddSBValue(self,AddValue):
         temp = self.SB.value
-        temp += AddValue
+        temp -= AddValue
         if(temp >= -0.6 and temp <= 0.6):
-            self.SB.value += AddValue
+            self.SB.value -= AddValue
             print("New Bottom servo value {}".format(self.SB.value))
         else:
             print("Bottom Servo Value out of limit! {}".format(temp))
+            if(temp >=0):
+                self.SB.value = 0.6
+            else:
+                self.SB.value = -0.6
     
     #we set value within limit otherwise we print overlimit in terminal
     #range allowed -1.0 to -0.4. limited to save hardware and wires
-    def SetSTValue(self,AddValue):
+    def AddSTValue(self,AddValue):
         temp = self.ST.value
-        temp += AddValue
-        if(temp >= -1.0 and temp <= -0.4):
-            self.ST.value += AddValue
+        temp -= AddValue
+        if(temp >= -1.0 and temp <= -0.25):
+            self.ST.value -= AddValue
             print("New Top servo value {}".format(self.ST.value))
         else:
             print("Top Servo Value out of limit! {}".format(temp))
-        
+            if(temp >-0.25):
+                self.ST.value = -0.25
+            else:
+                self.ST.value = -1.0
