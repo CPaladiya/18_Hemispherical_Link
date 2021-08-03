@@ -1,3 +1,4 @@
+
 from picamera import PiCamera
 from picamera.array import PiRGBArray
 from gpiozero.pins.pigpio import PiGPIOFactory
@@ -11,8 +12,9 @@ from DomeServo import DomeServo
 ########---------------------------initiating a class instance for servo------------
 AllServo = DomeServo()
 
-sleep(1)
-#AllServo.SetSBValue(0.2)
+#global variables to store offset as we go
+Offset_X = 0.0
+Offset_Y = 0.0
 #########-------------------------------Camera config-----------------------------
 #lets start all thing related camera
 camera = PiCamera()
@@ -30,7 +32,7 @@ small_ball = 500 #the minimum area of ball we want to identify
 sleep(0.1)
 
 #defining color boud for the ball as we required
-lower_green = np.array([55,60,60])
+lower_green = np.array([55,80,75])
 upper_green = np.array([86,255,255])
 
 #capturing the image frame by frame
@@ -61,13 +63,24 @@ for frame in camera.capture_continuous(rawCapture, format = "bgr", use_video_por
     
     #Drawing axis and center of the image
     LC.DrawAxis(masked)
-    #Drawing offset with respect to center of image and drawing live center of the ball
-    LC.PrintCentersOnImage(masked, Ball_X,Ball_Y)
+    #Drawing offset with respect to center of image and drawing live center of the ball and getting the offset values
+    Offset_X,Offset_Y = LC.PlotCentersAndGetOffset(masked, Ball_X,Ball_Y)
+    print("Offset X : {} Offset Y : {}".format(Offset_X,Offset_Y))
     
     #cv2.imshow("Frame", image) #showing the frame we just captured
     cv2.imshow("Masked Frame", masked) #showing the live masked feed
-    key = cv2.waitKey(1) #& 0xFF #showing the frame
     
+    #####-----------------------Logic to move Raspi Camera with respect to Ball!-----------------
+    # camera movement of 1000 pixel with respect to 1 value of servo itself
+    if(abs(Offset_X) >= 10 or abs(Offset_Y) >= 10):
+        NewValueSB = float(Offset_X)*0.001*0.80
+        NewValueST = float(Offset_Y)*0.001*0.80
+        print(f"New Value SB : {NewValueSB}")
+        print(f"New Value ST : {NewValueST}")
+        AllServo.AddSTValue(NewValueST)
+        AllServo.AddSBValue(NewValueSB)
+            
+    key = cv2.waitKey(1) #& 0xFF #showing the frame
     rawCapture.truncate(0) #clear the stream in preparation of the next frame
     
     if key == ord("q"): #making sure if we press q, we stop the stream
