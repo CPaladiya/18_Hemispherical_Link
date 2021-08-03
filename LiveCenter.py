@@ -1,6 +1,6 @@
 import cv2
-def GetLiveCenter(BinaryImage, maskedLiveFeedImage):
-    ''' Takes in BinaryImage of the feed and live masked feed. Finds contours within binary image, then finds biggest one of them all.
+def GetLiveCenter(BinaryImage):
+    ''' Takes in BinaryImage of the feed, Finds contours within binary image, then finds biggest one of them all.
         That contour is most probably a green ball. Then we find live center of the green ball and return it.
     '''
     #getting the contours out of the binary image
@@ -8,8 +8,8 @@ def GetLiveCenter(BinaryImage, maskedLiveFeedImage):
     if len(contours)!=0:
         #finding the biggest contours of all available
         max_contour = max(contours,key = cv2.contourArea)
-        #if balle is too near of too far, we dont want to do anything
-        if(cv2.contourArea(max_contour)>= 7700 and cv2.contourArea(max_contour)<= 77000):
+        #if balle is too near of too far, we dont want to do anything so we have set min and max area allowed for biggest contour
+        if(cv2.contourArea(max_contour)>= 5000 and cv2.contourArea(max_contour)<= 77000):
             #here we are getting very start (top left) points of contour and contour's width and height
             TLx,TLy,wContour,hContour = cv2.boundingRect(max_contour)
             ball_X = int(TLx+wContour/2)
@@ -18,7 +18,7 @@ def GetLiveCenter(BinaryImage, maskedLiveFeedImage):
     return 0,0
 
 def DrawAxis(Image):
-    '''Takes in image from a feed, and finds it center. Then it draws the center and axis of the image with respect of center of the image
+    '''Takes in live masked image from a feed, and finds it center. Then it draws the center and axis of the image with respect of center of the image
     '''
     #drawing the center of the image
     w = Image.shape[1] # width of the image
@@ -32,24 +32,26 @@ def DrawAxis(Image):
     cv2.line(Image, (X,0),(X,h), (0,0,255),1)
     
 def PrintCentersOnImage(Image,ball_X,ball_Y):
-    '''Takes in image from the feed, live location of ball. It draws, center of ball, the offset lines from axis and prints
+    '''Takes in live image from the feed, mostly a masked image, live location of ball. It draws, center of ball, the offset lines from axis and prints
        numbers on screen for offset and live location of the ball
     '''
-    #creating the string to be shown on the screen
-    wImage = Image.shape[1] #width of the image
-    hImage = Image.shape[0] #height of the image
-    X_offset = ball_X - int(wImage/2)
-    Y_offset = ball_Y - int(hImage/2)
-    OffsetLocation = "Offset X: "+str(X_offset)+ " Offset Y: "+ str(Y_offset) #offset from the center of the screen
-    LiveLocation = "Live X: "+str(ball_X)+ " Live Y: "+ str(ball_Y) #live location of ball
+    if(ball_X!=0 and ball_X!=0):
+        #creating the string to be shown on the screen
+        wImage = Image.shape[1] #width of the image
+        hImage = Image.shape[0] #height of the image
+        X_offset = ball_X - int(wImage/2)
+        Y_offset = ball_Y - int(hImage/2)
+        OffsetLocation = "Offset X: "+str(X_offset)+ " Offset Y: "+ str(Y_offset) #offset from the center of the screen
+        LiveLocation = "Live X: "+str(ball_X)+ " Live Y: "+ str(ball_Y) #live location of ball
     
-    cv2.circle(Image, (ball_X,ball_Y), 10, (0,255,255),-1) #Drawing live center of the ball
-    #adding the string to live feed masked image
-    #image, string, leftBottom point of string,font type, font scale, color, thickness of line, line type
-    cv2.putText(Image,LiveLocation, (10,hImage-10), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (244,242,115), 2, cv2.LINE_AA)
-    #printing the offset value, on how much are we offset from the desired image center
-    cv2.putText(Image,OffsetLocation, (10,hImage-45), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (247,243,129), 2, cv2.LINE_AA)
+        cv2.circle(Image, (ball_X,ball_Y), 10, (0,255,255),-1) #Drawing live center of the ball
+        #adding the string to live feed masked image
+        #image, string, leftBottom point of string,font type, font scale, color, thickness of line, line type
+        cv2.putText(Image,LiveLocation, (10,hImage-10), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (244,242,115), 2, cv2.LINE_AA)
+        #printing the offset value, on how much are we offset from the desired image center
+        cv2.putText(Image,OffsetLocation, (10,hImage-45), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (247,243,129), 2, cv2.LINE_AA)
     
-    #drawing offset line from center of the ball to the relevant axis
-    cv2.line(Image, (ball_X,ball_Y),(ball_X,int(hImage/2)), (0,255,255),1)
-    cv2.line(Image, (ball_X,ball_Y),(int(wImage/2),ball_Y), (0,255,255),1)
+        #drawing offset line from center of the ball to the relevant axis
+        cv2.line(Image, (ball_X,ball_Y),(ball_X,int(hImage/2)), (0,255,255),1)
+        cv2.line(Image, (ball_X,ball_Y),(int(wImage/2),ball_Y), (0,255,255),1)
+            
